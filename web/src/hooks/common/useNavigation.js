@@ -28,6 +28,7 @@ export const useNavigation = (t, docsLink, headerNavModules) => {
       pricing: true,
       docs: true,
       about: true,
+      playground:true
     };
 
     // 使用传入的配置或默认配置
@@ -48,6 +49,11 @@ export const useNavigation = (t, docsLink, headerNavModules) => {
         text: t('模型广场'),
         itemKey: 'pricing',
         to: '/pricing',
+      },
+      {
+        text: t('模型对话'),
+        itemKey: 'playground',
+        to: '/console/playground',
       },
       ...(docsLink
         ? [
@@ -76,6 +82,12 @@ export const useNavigation = (t, docsLink, headerNavModules) => {
         return typeof modules.pricing === 'object'
           ? modules.pricing.enabled
           : modules.pricing;
+      }
+      if (link.itemKey === 'playground') {
+        // 支持新的playground配置格式
+        return typeof modules.playground === 'object'
+          ? modules.playground.enabled
+          : modules.playground;
       }
       return modules[link.itemKey] === true;
     });

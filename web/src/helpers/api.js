@@ -231,22 +231,8 @@ export async function getOAuthState() {
   }
 }
 
-async function prepareOAuthState(options = {}) {
-  const { shouldLogout = false } = options;
-  if (shouldLogout) {
-    try {
-      await API.get('/api/user/logout', { skipErrorHandler: true });
-    } catch (err) {
-
-    }
-    localStorage.removeItem('user');
-    updateAPI();
-  }
-  return await getOAuthState();
-}
-
-export async function onDiscordOAuthClicked(client_id, options = {}) {
-  const state = await prepareOAuthState(options);
+export async function onDiscordOAuthClicked(client_id) {
+  const state = await getOAuthState();
   if (!state) return;
   const redirect_uri = `${window.location.origin}/oauth/discord`;
   const response_type = 'code';
@@ -256,13 +242,8 @@ export async function onDiscordOAuthClicked(client_id, options = {}) {
   );
 }
 
-export async function onOIDCClicked(
-  auth_url,
-  client_id,
-  openInNewTab = false,
-  options = {},
-) {
-  const state = await prepareOAuthState(options);
+export async function onOIDCClicked(auth_url, client_id, openInNewTab = false) {
+  const state = await getOAuthState();
   if (!state) return;
   const url = new URL(auth_url);
   url.searchParams.set('client_id', client_id);
@@ -277,19 +258,16 @@ export async function onOIDCClicked(
   }
 }
 
-export async function onGitHubOAuthClicked(github_client_id, options = {}) {
-  const state = await prepareOAuthState(options);
+export async function onGitHubOAuthClicked(github_client_id) {
+  const state = await getOAuthState();
   if (!state) return;
   window.open(
     `https://github.com/login/oauth/authorize?client_id=${github_client_id}&state=${state}&scope=user:email`,
   );
 }
 
-export async function onLinuxDOOAuthClicked(
-  linuxdo_client_id,
-  options = { shouldLogout: false },
-) {
-  const state = await prepareOAuthState(options);
+export async function onLinuxDOOAuthClicked(linuxdo_client_id) {
+  const state = await getOAuthState();
   if (!state) return;
   window.open(
     `https://connect.linux.do/oauth2/authorize?response_type=code&client_id=${linuxdo_client_id}&state=${state}`,

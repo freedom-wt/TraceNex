@@ -42,7 +42,6 @@ import Midjourney from './pages/Midjourney';
 import Pricing from './pages/Pricing';
 import Task from './pages/Task';
 import ModelPage from './pages/Model';
-import ModelDeploymentPage from './pages/ModelDeployment';
 import Playground from './pages/Playground';
 import OAuth2Callback from './components/auth/OAuth2Callback';
 import PersonalSetting from './components/settings/PersonalSetting';
@@ -70,7 +69,30 @@ function App() {
         if (typeof modules.pricing === 'boolean') {
           return false; // 默认不需要登录鉴权
         }
+        // 处理向后兼容性：如果playground是boolean，默认不需要登录
+        if (typeof modules.playground === 'boolean') {
+          return false; // 默认不需要登录鉴权
+        }
+        // 如果是对象格式，使用requireAuth配置
+        return modules.pricing?.requireAuth === true;
+      } catch (error) {
+        console.error('解析顶栏模块配置失败:', error);
+        return false; // 默认不需要登录
+      }
+    }
+    return false; // 默认不需要登录
+  }, [statusState?.status?.HeaderNavModules]);
 
+    // 获取操作场权限配置
+  const playgroundRequireAuth = useMemo(() => {
+    const headerNavModulesConfig = statusState?.status?.HeaderNavModules;
+    if (headerNavModulesConfig) {
+      try {
+        const modules = JSON.parse(headerNavModulesConfig);
+        // 处理向后兼容性：如果playground是boolean，默认不需要登录
+        if (typeof modules.playground === 'boolean') {
+          return false; // 默认不需要登录鉴权
+        }
         // 如果是对象格式，使用requireAuth配置
         return modules.pricing?.requireAuth === true;
       } catch (error) {
@@ -110,14 +132,6 @@ function App() {
           }
         />
         <Route
-          path='/console/deployment'
-          element={
-            <AdminRoute>
-              <ModelDeploymentPage />
-            </AdminRoute>
-          }
-        />
-        <Route
           path='/console/channel'
           element={
             <AdminRoute>
@@ -135,10 +149,26 @@ function App() {
         />
         <Route
           path='/console/playground'
+          // element={
+          //   <PrivateRoute>
+          //     <Playground />
+          //   </PrivateRoute>
+          // }
           element={
-            <PrivateRoute>
-              <Playground />
-            </PrivateRoute>
+            playgroundRequireAuth ? (
+              <PrivateRoute>
+                <Suspense
+                  fallback={<Loading></Loading>}
+                  key={location.pathname}
+                >
+                  <Playground />
+                </Suspense>
+              </PrivateRoute>
+            ) : (
+              <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+                <Playground />
+              </Suspense>
+            )
           }
         />
         <Route

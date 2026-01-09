@@ -52,6 +52,7 @@ const SkeletonWrapper = ({
             active
             placeholder={
               <Skeleton.Title
+                active
                 style={{ width: isMobile ? 40 : width, height }}
               />
             }
@@ -70,7 +71,7 @@ const SkeletonWrapper = ({
           loading={true}
           active
           placeholder={
-            <Skeleton.Avatar size='extra-small' className='shadow-sm' />
+            <Skeleton.Avatar active size='extra-small' className='shadow-sm' />
           }
         />
         <div className='ml-1.5 mr-1'>
@@ -79,6 +80,7 @@ const SkeletonWrapper = ({
             active
             placeholder={
               <Skeleton.Title
+                active
                 style={{ width: isMobile ? 15 : width, height: 12 }}
               />
             }
@@ -96,6 +98,7 @@ const SkeletonWrapper = ({
         active
         placeholder={
           <Skeleton.Image
+            active
             className={`absolute inset-0 !rounded-full ${className}`}
             style={{ width: '100%', height: '100%' }}
           />
@@ -110,7 +113,7 @@ const SkeletonWrapper = ({
       <Skeleton
         loading={true}
         active
-        placeholder={<Skeleton.Title style={{ width, height: 24 }} />}
+        placeholder={<Skeleton.Title active style={{ width, height: 24 }} />}
       />
     );
   };
@@ -122,7 +125,7 @@ const SkeletonWrapper = ({
         <Skeleton
           loading={true}
           active
-          placeholder={<Skeleton.Title style={{ width, height }} />}
+          placeholder={<Skeleton.Title active style={{ width, height }} />}
         />
       </div>
     );
@@ -137,6 +140,7 @@ const SkeletonWrapper = ({
           active
           placeholder={
             <Skeleton.Title
+              active
               style={{ width, height, borderRadius: 9999 }}
             />
           }
@@ -160,7 +164,7 @@ const SkeletonWrapper = ({
               loading={true}
               active
               placeholder={
-                <Skeleton.Avatar size='extra-small' shape='square' />
+                <Skeleton.Avatar active size='extra-small' shape='square' />
               }
             />
           </div>
@@ -170,6 +174,7 @@ const SkeletonWrapper = ({
             active
             placeholder={
               <Skeleton.Title
+                active
                 style={{ width: width || 80, height: height || 14 }}
               />
             }
@@ -186,7 +191,10 @@ const SkeletonWrapper = ({
           loading={true}
           active
           placeholder={
-            <Skeleton.Title style={{ width: width || 60, height: height || 12 }} />
+            <Skeleton.Title
+              active
+              style={{ width: width || 60, height: height || 12 }}
+            />
           }
         />
       </div>
@@ -209,6 +217,7 @@ const SkeletonWrapper = ({
         active
         placeholder={
           <Skeleton.Avatar
+            active
             shape='square'
             style={{ width: ICON_SIZE, height: ICON_SIZE }}
           />
@@ -222,6 +231,7 @@ const SkeletonWrapper = ({
         active
         placeholder={
           <Skeleton.Title
+            active
             style={{ width: labelWidth, height: TEXT_HEIGHT }}
           />
         }
@@ -259,6 +269,7 @@ const SkeletonWrapper = ({
           active
           placeholder={
             <Skeleton.Avatar
+              active
               shape='square'
               style={{ width: ICON_SIZE, height: ICON_SIZE }}
             />
@@ -318,6 +329,7 @@ const SkeletonWrapper = ({
                     active
                     placeholder={
                       <Skeleton.Title
+                        active
                         style={{ width: sec.titleWidth, height: TITLE_HEIGHT }}
                       />
                     }
@@ -338,6 +350,7 @@ const SkeletonWrapper = ({
                     active
                     placeholder={
                       <Skeleton.Title
+                        active
                         style={{ width: sec.titleWidth, height: TITLE_HEIGHT }}
                       />
                     }

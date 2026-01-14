@@ -14,15 +14,15 @@
 
 version: '3.4' # For compatibility with older Docker versions
 
-services:
-  new-api:
+services: 
+  new-api: 
     image: calciumion/new-api:latest
     container_name: new-api
     restart: always
     command: --log-dir /app/logs
-    ports:
+    ports: 
       - "3000:3000"
-    volumes:
+    volumes: 
       - ./data:/data
       - ./logs:/app/logs
     environment:
@@ -40,9 +40,9 @@ services:
 #      - UMAMI_SCRIPT_URL=https://analytics.umami.is/script.js  # Umami 脚本 URL，默认为官方地址 (Umami Script URL, defaults to official URL)
 
     depends_on:
-      - redis
+#      - redis
       - postgres
-#      - mysql  # Uncomment if using MySQL
+      - mysql  # Uncomment if using MySQL
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O - http://localhost:3000/api/status | grep -o '\"success\":\\s*true' || exit 1"]
       interval: 30s
@@ -67,18 +67,18 @@ services:
 #    ports:
 #      - "5432:5432"  # Uncomment if you need to access PostgreSQL from outside Docker
 
-#  mysql:
-#    image: mysql:8.2
-#    container_name: mysql
-#    restart: always
-#    environment:
-#      MYSQL_ROOT_PASSWORD: 123456  # ⚠️ IMPORTANT: Change this password in production!
-#      MYSQL_DATABASE: new-api
-#    volumes:
-#      - mysql_data:/var/lib/mysql
-#    ports:
-#      - "3306:3306"  # Uncomment if you need to access MySQL from outside Docker
+  mysql:
+    image: mysql:8.2
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456  # ⚠️ IMPORTANT: Change this password in production!
+      MYSQL_DATABASE: new-api
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"  # Uncomment if you need to access MySQL from outside Docker
 
 volumes:
-  pg_data:
-#  mysql_data:
+#  pg_data:
+  mysql_data:

@@ -18,8 +18,6 @@ tiktoken_cache
 .gocache
 .gomodcache/
 .cache
-
-
 electron/node_modules
 electron/dist
 data/

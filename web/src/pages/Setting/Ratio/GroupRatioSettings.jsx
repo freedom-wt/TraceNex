@@ -122,7 +122,7 @@ export default function GroupRatioSettings(props) {
               label={t('添加用户名称')}
               placeholder={t('为一个 JSON 文本，键为分组名称，值为倍率')}
               extraText={t(
-                '添加用户名称设置，可以在此处新增分组或修改现有分组的倍率，格式为 JSON 字符串，例如：{"vip": 0.5, "test": 1}，表示 vip 分组的倍率为 0.5，test 分组的倍率为 1',
+                '添加用户名称可以在此处新增用户名称或修改现有用户名称的倍率，格式为 JSON 字符串，例如：{"wt": 0.5, "hjj": 1}，表示 wt 用户的倍率为 0.5，hjj 用户的倍率为 1',
               )}
               field={'GroupRatio'}
               autosize={{ minRows: 6, maxRows: 12 }}

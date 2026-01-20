@@ -192,7 +192,7 @@ export default function GroupRatioSettings(props) {
               label={t('用户令牌分组权限设置')}
               placeholder={t('为一个 JSON 文本')}
               extraText={t(
-                '键为用户名称，值为操作映射对象。内层键以"+:"开头表示添加指定分组（键值为分组名称，值为描述），以"-:"开头表示移除指定分组（键值为分组名称），不带前缀的键直接添加该分组。例如：{"hjj": {"+:豆包模型分组": "豆包模型分组", "special": "特殊分组", "-:default": "默认分组"}}，表示用户 hjj 可以使用 豆包模型分组 和 special 分组，同时移除 default 分组的访问权限',
+                '键为用户名称，值为操作映射对象。内层键以"+:"开头表示添加指定分组（键值为分组名称，值为描述），以"-:"开头表示移除指定分组（键值为分组名称），不带前缀的键直接添加该分组。例如：{"hjj": {"+:豆包模型分组": "豆包模型分组", "-:default": "默认分组"}}，表示用户 hjj 可以使用豆包模型分组，同时移除 default 分组的访问权限',
               )}
               field={'group_ratio_setting.group_special_usable_group'}
               autosize={{ minRows: 6, maxRows: 12 }}

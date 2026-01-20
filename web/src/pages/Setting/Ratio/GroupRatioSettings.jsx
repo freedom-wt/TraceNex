@@ -122,7 +122,7 @@ export default function GroupRatioSettings(props) {
               label={t('添加用户名称')}
               placeholder={t('为一个 JSON 文本，键为分组名称，值为倍率')}
               extraText={t(
-                '添加用户名称设置，可以在此处新增分组或修改现有分组的倍率，格式为 JSON 字符串，例如：{"vip": 0.5, "test": 1}，表示 vip 分组的倍率为 0.5，test 分组的倍率为 1',
+                '添加用户名称设置，可以在此处新增分组或修改现有分组的倍率，格式为 JSON 字符串，例如：{"wt": 0.5, "hjj": 1}，表示 wt 分组的倍率为 0.hjj 分组的倍率为 1',
               )}
               field={'GroupRatio'}
               autosize={{ minRows: 6, maxRows: 12 }}
@@ -144,7 +144,7 @@ export default function GroupRatioSettings(props) {
               label={t('令牌分组')}
               placeholder={t('为一个 JSON 文本，键为分组名称，值为分组描述')}
               extraText={t(
-                '用户新建令牌时可选的分组，格式为 JSON 字符串，例如：{"vip": "VIP 用户", "test": "测试"}，表示用户可以选择 vip 分组和 test 分组',
+                '用户新建令牌时可选的分组，格式为 JSON 字符串，例如：{"hjj": "豆包模型分组", "wt": "Qwen模型分组"}，表示用户可以选择 豆包模型 分组和 Qwen 分组',
               )}
               field={'UserUsableGroups'}
               autosize={{ minRows: 6, maxRows: 12 }}
@@ -168,7 +168,7 @@ export default function GroupRatioSettings(props) {
               label={t('特殊模型分组折扣')}
               placeholder={t('为一个 JSON 文本')}
               extraText={t(
-                '键为分组名称，值为另一个 JSON 对象，键为分组名称，值为该分组的用户的特殊分组倍率，例如：{"vip": {"default": 0.5, "test": 1}}，表示 vip 分组的用户在使用default分组的令牌时倍率为0.5，使用test分组时倍率为1',
+                '键为分组名称，值为另一个 JSON 对象，键为分组名称，值为该分组的用户的特殊分组倍率，例如：{"hjj": {"豆包模型分组": 0.8 }}，表示用户hjj在使用豆包模型分组的令牌时折扣为0.8',
               )}
               field={'GroupGroupRatio'}
               autosize={{ minRows: 6, maxRows: 12 }}
@@ -192,7 +192,7 @@ export default function GroupRatioSettings(props) {
               label={t('用户令牌分组权限设置')}
               placeholder={t('为一个 JSON 文本')}
               extraText={t(
-                '键为用户分组名称，值为操作映射对象。内层键以"+:"开头表示添加指定分组（键值为分组名称，值为描述），以"-:"开头表示移除指定分组（键值为分组名称），不带前缀的键直接添加该分组。例如：{"vip": {"+:premium": "高级分组", "special": "特殊分组", "-:default": "默认分组"}}，表示 vip 分组的用户可以使用 premium 和 special 分组，同时移除 default 分组的访问权限',
+                '键为用户名称，值为操作映射对象。内层键以"+:"开头表示添加指定分组（键值为分组名称，值为描述），以"-:"开头表示移除指定分组（键值为分组名称），不带前缀的键直接添加该分组。例如：{"hjj": {"+:豆包模型分组": "豆包模型分组", "special": "特殊分组", "-:default": "默认分组"}}，表示用户 hjj 可以使用 豆包模型分组 和 special 分组，同时移除 default 分组的访问权限',
               )}
               field={'group_ratio_setting.group_special_usable_group'}
               autosize={{ minRows: 6, maxRows: 12 }}

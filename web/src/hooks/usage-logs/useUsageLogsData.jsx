@@ -545,7 +545,6 @@ export const useLogsData = () => {
       setPageSize(data.page_size);
       setLogCount(data.total);
 
-      setLogsFormat(newPageData);
       return {
         list: newPageData,
         total: data.total,
@@ -554,6 +553,81 @@ export const useLogsData = () => {
       showError(message);
     }
   }
+
+ // 辅助函数1：时间戳转 YYYY-MM-DD HH:mm:ss 格式
+  const formatTimestamp = (timestamp) => {
+    if (!timestamp) return '无';
+    const date = new Date(timestamp * 1000);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  };
+
+  // 辅助函数2：类型数字转文字描述（适配你的接口 type 字段）
+  const formatLogType = (type) => {
+    const typeMap = {
+      2: '消费',
+      3: '额度修改',
+      // 可补充其他 type 对应的文字
+    };
+    return typeMap[type] || `未知类型(${type})`;
+  };
+
+  // 辅助函数3：解析 other 字段，提取关键信息
+  const parseOtherField = (otherStr) => {
+    if (!otherStr) return { model_ratio: 0, group_ratio: 0, admin_info: {} };
+    try {
+      const otherObj = JSON.parse(otherStr);
+      return {
+        model_ratio: otherObj.model_ratio || 0,
+        group_ratio: otherObj.group_ratio || 0,
+        admin_info: otherObj.admin_info || {},
+      };
+    } catch (e) {
+      return { model_ratio: 0, group_ratio: 0, admin_info: {} };
+    }
+  };
+
+  // 辅助函数4：计算花费（基于 token 数 + 模型倍率，可适配你的业务规则）
+  const calculateCost = (promptTokens, completionTokens, modelRatio, groupRatio) => {
+    // 基础费率（可根据你的业务调整，单位：元/1000 token）
+    const basePromptRate = 0.01; // 输入 token 基础费率
+    const baseCompletionRate = 0.03; // 输出 token 基础费率
+
+    if (promptTokens === 0 && completionTokens === 0) return '0.000000';
+
+    // 实际花费 = (输入token×输入基础费率 + 输出token×输出基础费率) × 模型倍率 × 分组倍率
+    const promptCost = (promptTokens / 1000) * basePromptRate * modelRatio * groupRatio;
+    const completionCost = (completionTokens / 1000) * baseCompletionRate * modelRatio * groupRatio;
+    return (promptCost + completionCost).toFixed(6);
+  };
+
+  // 辅助函数5：处理单条原始数据，映射为 Excel 所需格式
+  const formatSingleRow = (rawItem) => {
+    const { model_ratio, group_ratio } = parseOtherField(rawItem.other);
+    const isStreamText = rawItem.is_stream ? '流' : '非流';
+
+    return {
+      time: formatTimestamp(rawItem.created_at),
+      channel: rawItem.channel_name || rawItem.channel || '无',
+      token: rawItem.token_name || '无',
+      group: rawItem.group || '无',
+      type: formatLogType(rawItem.type),
+      model: rawItem.model_name || '无',
+      use_time: rawItem.use_time > 0 ? `${rawItem.use_time} s ${isStreamText}` : `0 s ${isStreamText}`,
+      prompt: rawItem.prompt_tokens || 0,
+      completion: rawItem.completion_tokens || 0,
+      cost: calculateCost(rawItem.prompt_tokens, rawItem.completion_tokens, model_ratio, group_ratio),
+      ip: rawItem.ip || '无',
+      retry: '无', // 你的接口返回中无 retry 字段，先兜底为「无」，后续可补充
+      details: `模型:${model_ratio} * 分组倍率:${group_ratio}` // 匹配图一详情格式
+    };
+  };
+
   const exportAllLogs = useCallback(async () => {
     
     if (isExporting) return;
@@ -581,19 +655,19 @@ export const useLogsData = () => {
       // 设置Excel表头（适配数据字段）
       workSheet.columns = [
         {header: '时间', key: 'time', width: 20},
-        {header: '渠道', key: 'channel', width: 20},
-        // {header: '用户', key: 'username', width: 20},
-        {header: '令牌', key: 'token', width: 20},
-        {header: '分组', key: 'group', width: 20},
-        {header: '类型', key: 'type', width: 20},
+        {header: '渠道', key: 'channel', width: 10},
+        // {header: '用户', key: 'username', width: 10},
+        {header: '令牌', key: 'token', width: 10},
+        {header: '分组', key: 'group', width: 10},
+        {header: '类型', key: 'type', width: 10},
         {header: '模型', key: 'model', width: 20},
-        {header: '用时/首字', key: 'use_time', width: 20},
-        {header: '输入', key: 'prompt', width: 20},
-        {header: '输出', key: 'completion', width: 20},
-        {header: '花费', key: 'cost', width: 20},
-        {header: 'IP', key: 'ip', width: 20},
-        {header: '重试', key: 'retry', width: 20},
-        {header: '详情', key: 'details', width: 60},
+        {header: '用时/首字', key: 'use_time', width: 10},
+        {header: '输入', key: 'prompt', width: 10},
+        {header: '输出', key: 'completion', width: 10},
+        {header: '花费', key: 'cost', width: 10},
+        {header: 'IP', key: 'ip', width: 10},
+        {header: '重试', key: 'retry', width: 10},
+        {header: '详情', key: 'details', width: 30},
       ];
       // 表头样式
       workSheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
@@ -603,7 +677,7 @@ export const useLogsData = () => {
       while (true) {
         // 检查是否中断
         if (signal.aborted) break;
- console.log('1111111',currentPage,getFormValues());
+ 
         // 拉取当前页数据
         setExportProgress(`正在获取第${currentPage}页数据...`);
         const pageResult = await fetchPageData(currentPage);
@@ -617,8 +691,11 @@ export const useLogsData = () => {
           setExportProgress(`共${totalCount}条数据，分${totalPages}页，正在获取第${currentPage}页...`);
         }
         
+        // 关键修改：处理当前页原始数据，映射为Excel所需格式
+        const formattedRows = pageResult.list.map(item => formatSingleRow(item));
+
         // 追加当前页数据到Excel
-        workSheet.addRows(pageResult.list);
+        workSheet.addRows(formattedRows);
         fetchedTotal += pageResult.list.length;
 
         // 更新进度

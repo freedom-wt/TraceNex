@@ -9,7 +9,7 @@ export default function TraceNexDoc() {
             src={url}
             width='100%'
             height='100vh'
-            title="文档"
+            title="用户手册"
             style={{border:'none', height:'100vh'}}
             />
             

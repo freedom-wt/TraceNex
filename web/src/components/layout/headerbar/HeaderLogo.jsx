@@ -21,11 +21,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Typography, Tag } from '@douyinfe/semi-ui';
 import SkeletonWrapper from '../components/SkeletonWrapper';
+import logo from "../../../../public/new_logo.png"
 
 const HeaderLogo = ({
   isMobile,
   isConsoleRoute,
-  logo,
+  // logo,
   logoLoaded,
   isLoading,
   systemName,

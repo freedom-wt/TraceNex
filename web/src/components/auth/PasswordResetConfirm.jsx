@@ -49,8 +49,7 @@ const PasswordResetConfirm = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [formApi, setFormApi] = useState(null);
 
-  // const logo = getLogo();
-  const logo = '../../../public/new_logo.png'
+  const logo = getLogo();
   const systemName = getSystemName();
 
   useEffect(() => {

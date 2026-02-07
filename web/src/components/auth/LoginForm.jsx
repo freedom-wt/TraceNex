@@ -94,8 +94,7 @@ const LoginForm = () => {
   const [githubButtonDisabled, setGithubButtonDisabled] = useState(false);
   const githubTimeoutRef = useRef(null);
 
-  // const logo = getLogo();
-  const logo = '../../../public/new_logo.png'
+  const logo = getLogo();
   const systemName = getSystemName();
 
   let affCode = new URLSearchParams(window.location.search).get('aff');

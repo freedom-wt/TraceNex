@@ -1,0 +1,1 @@
+import{j as e}from"./semi-ui-wA5uWork.js";import"./react-core-D-iPSUlg.js";function h(){return e.jsx("div",{style:{width:"100%",minHeight:"100vh"},children:e.jsx("iframe",{src:"https://www.yuque.com/wangteng-w8rzb/xxa8h4/xgm84a15566wmbu4?singleDoc# 《TraceNex》",width:"100%",height:"100vh",title:"用户手册",style:{border:"none",height:"100vh"}})})}export{h as default};

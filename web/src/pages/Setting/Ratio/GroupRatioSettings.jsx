@@ -258,7 +258,7 @@ export default function GroupRatioSettings(props) {
       if (!updateArray.length) {
         return showWarning(t('你似乎并没有修改什么'));
       }
-      
+
       // 构建请求队列
       const requestQueue = updateArray.map((item) => {
         const value = typeof formData[item.key] === 'boolean'
@@ -512,6 +512,35 @@ export default function GroupRatioSettings(props) {
     }
     return newArray;
   };
+
+  const onChangeValue = (newValue, record, type, index) => {
+    const trimmedNewValue = newValue.trim();
+    const oldValue = record[type].trim();
+    // 函数式更新，确保拿到最新的状态
+    if (type === 'useGroup') {
+      setSpecialUsableGroupData(prevData => {
+        const list = prevData.map(item => {
+          if (item[type].trim() === oldValue) {
+            return { ...item, userGroup: trimmedNewValue };
+          }
+          return item;
+        });
+        const newList = list.filter((item, ind) => ind !== index);
+        const newObj = { ...record, userGroup: trimmedNewValue };
+        const newDta = addItemToSameUserGroupEnd(newList, newObj);
+        return newDta;
+      });
+    } else {
+      setSpecialUsableGroupData(prevData => {
+        return prevData.map(item => {
+          if (item[type].trim() === oldValue) {
+            return { ...item, [type]: trimmedNewValue }
+          }
+          return item
+        })
+      })
+    }
+  };
   // 分组特殊可用分组表格列配置（添加行列合并逻辑）
   const specialUsableGroupColumns = useMemo(() => {
     return [
@@ -523,31 +552,13 @@ export default function GroupRatioSettings(props) {
         render: (value, record, index) => {
           const { rowSpan, hidden } = mergeSpanConfig[index] || { rowSpan: 1, hidden: false };
           // 修复：userGroup 同步逻辑（先取新值，再匹配旧分组）
-          const onChange = (newValue) => {
-            const trimmedNewValue = newValue.trim();
-            const oldGroup = record.userGroup.trim();
-            // 函数式更新，确保拿到最新的状态
-            setSpecialUsableGroupData(prevData => {
-
-              const list = prevData.map(item => {
-                if (item.userGroup.trim() === oldGroup) {
-                  return { ...item, userGroup: trimmedNewValue };
-                }
-                return item;
-              });
-              const newList = list.filter((item, ind) => ind !== index);
-              const newObj = { ...record, userGroup: trimmedNewValue };
-              const newDta = addItemToSameUserGroupEnd(newList, newObj);
-              return newDta;
-
-            });
-          };
-
           return {
             children: hidden ? null : ( // 隐藏的单元格不渲染内容
               <Input
                 value={value}
-                onChange={onChange}
+                onChange={(newValue) => {
+                  onChangeValue(newValue, record, 'userGroup', index);
+                }}
                 placeholder={t('请输入用户分组名称（如default/黄金）')}
                 style={{ width: '100%' }}
               />
@@ -587,10 +598,8 @@ export default function GroupRatioSettings(props) {
         render: (text, record, index) => (
           <Input
             value={text}
-            onChange={(value) => {
-              const newData = [...specialUsableGroupData];
-              newData[index].targetGroup = value;
-              setSpecialUsableGroupData(newData);
+            onChange={(newValue) => {
+              onChangeValue(newValue, record, 'targetGroup', index);
             }}
             placeholder={t('请输入目标分组名（如黄金/append_1）')}
           />
@@ -603,10 +612,8 @@ export default function GroupRatioSettings(props) {
         render: (text, record, index) => (
           <Input
             value={text}
-            onChange={(value) => {
-              const newData = [...specialUsableGroupData];
-              newData[index].desc = value;
-              setSpecialUsableGroupData(newData);
+            onChange={(newValue) => {
+              onChangeValue(newValue, record, 'desc', index);
             }}
             placeholder={t('请输入描述信息（如黄金分组）')}
           />
@@ -686,14 +693,22 @@ export default function GroupRatioSettings(props) {
               pagination={false}
               bordered
             />
-            <Button
-              theme="primary"
-              size="small"
-              style={{ marginTop: 10 }}
-              onClick={() => addRow(setGroupRatioData, { groupName: '', ratio: '' })}
-            >
-              {t('新增行')}
-            </Button>
+            <div className='flex justify-between'>
+              <Button
+                theme="primary"
+                size="small"
+                style={{ marginTop: 10 }}
+                onClick={() => addRow(setGroupRatioData, { groupName: '', ratio: '' })}
+              >
+                {t('新增行')}
+              </Button>
+              <p style={{ color: '#666' }} className='mt-2'>
+                {t('总计')}
+                <span style={{ color: 'rgb(0, 100, 250)', fontWeight: 600 }} className='mr-2 ml-2'>
+                  {groupRatioData ? groupRatioData.length : 0}
+                </span>
+                {t('条')}
+              </p></div>
           </Col>
         </Row>
 
@@ -710,14 +725,22 @@ export default function GroupRatioSettings(props) {
               pagination={false}
               bordered
             />
-            <Button
-              theme="primary"
-              size="small"
-              style={{ marginTop: 10 }}
-              onClick={() => addRow(setUserUsableGroupsData, { groupName: '', desc: '' })}
-            >
-              {t('新增行')}
-            </Button>
+            <div className='flex justify-between'>
+              <Button
+                theme="primary"
+                size="small"
+                style={{ marginTop: 10 }}
+                onClick={() => addRow(setUserUsableGroupsData, { groupName: '', desc: '' })}
+              >
+                {t('新增行')}
+              </Button>
+              <p style={{ color: '#666' }} className='mt-2'>
+                {t('总计')}
+                <span style={{ color: 'rgb(0, 100, 250)', fontWeight: 600 }} className='mr-2 ml-2'>
+                  {userUsableGroupsData ? userUsableGroupsData.length : 0}
+                </span>
+                {t('条')}
+              </p></div>
           </Col>
         </Row>
 
@@ -734,14 +757,22 @@ export default function GroupRatioSettings(props) {
               pagination={false}
               bordered
             />
-            <Button
-              theme="primary"
-              size="small"
-              style={{ marginTop: 10 }}
-              onClick={() => addRow(setGroupGroupRatioData, { outerGroup: '', innerGroup: '', ratio: '' })}
-            >
-              {t('新增行')}
-            </Button>
+            <div className='flex justify-between'>
+              <Button
+                theme="primary"
+                size="small"
+                style={{ marginTop: 10 }}
+                onClick={() => addRow(setGroupGroupRatioData, { outerGroup: '', innerGroup: '', ratio: '' })}
+              >
+                {t('新增行')}
+              </Button>
+              <p style={{ color: '#666' }} className='mt-2'>
+                {t('总计')}
+                <span style={{ color: 'rgb(0, 100, 250)', fontWeight: 600 }} className='mr-2 ml-2'>
+                  {groupGroupRatioData ? groupGroupRatioData.length : 0}
+                </span>
+                {t('条')}
+              </p></div>
           </Col>
         </Row>
 
@@ -757,25 +788,35 @@ export default function GroupRatioSettings(props) {
               dataSource={specialUsableGroupData}
               pagination={false}
               bordered
-              scroll={{ x: '100%',y: '500px' }}
+              scroll={{ x: '100%', y: '500px' }}
             />
-            <Button
-              theme="primary"
-              size="small"
-              style={{ marginTop: 10 }}
-              onClick={() => {
-                const inheritGroup = selectedRowIndex >= 0
-                  ? specialUsableGroupData[selectedRowIndex].userGroup
-                  : '';
-                addRow(
-                  setSpecialUsableGroupData,
-                  { userGroup: '', op: '+:', targetGroup: '', desc: '' },
-                  inheritGroup
-                );
-              }}
-            >
-              {t('新增行')}
-            </Button>
+            <div className='flex justify-between'>
+              <Button
+                theme="primary"
+                size="small"
+                style={{ marginTop: 10 }}
+                onClick={() => {
+                  const inheritGroup = selectedRowIndex >= 0
+                    ? specialUsableGroupData[selectedRowIndex].userGroup
+                    : '';
+                  addRow(
+                    setSpecialUsableGroupData,
+                    { userGroup: '', op: '+:', targetGroup: '', desc: '' },
+                    inheritGroup
+                  );
+                }}
+              >
+                {t('新增行')}
+              </Button>
+              <p style={{ color: '#666' }} className='mt-2'>
+                {t('总计')}
+                <span style={{ color: 'rgb(0, 100, 250)', fontWeight: 600 }} className='mr-2 ml-2'>
+                  {specialUsableGroupData ? specialUsableGroupData.length : 0}
+                </span>
+                {t('条')}
+              </p>
+            </div>
+
           </Col>
         </Row>
 

@@ -48,7 +48,8 @@ const PasswordResetForm = () => {
   const [disableButton, setDisableButton] = useState(false);
   const [countdown, setCountdown] = useState(30);
 
-  const logo = getLogo();
+  // const logo = getLogo();
+  const logo = '../../../public/new_logo.png'
   const systemName = getSystemName();
 
   useEffect(() => {

@@ -42,7 +42,6 @@ import { Button, Card, Checkbox, Divider, Form, Icon, Modal } from '@douyinfe/se
 import Title from '@douyinfe/semi-ui/lib/es/typography/title';
 import Text from '@douyinfe/semi-ui/lib/es/typography/text';
 import TelegramLoginButton from 'react-telegram-login';
-import logo from "../../../public/new_logo.png"
 
 import {
   IconGithubLogo,
@@ -96,6 +95,7 @@ const LoginForm = () => {
   const githubTimeoutRef = useRef(null);
 
   // const logo = getLogo();
+  const logo = '../../../public/new_logo.png'
   const systemName = getSystemName();
 
   let affCode = new URLSearchParams(window.location.search).get('aff');

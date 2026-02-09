@@ -53,7 +53,7 @@ const Dashboard = lazy(() => import('./pages/Dashboard'));
 const About = lazy(() => import('./pages/About'));
 const UserAgreement = lazy(() => import('./pages/UserAgreement'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
-const TraceNexDoc = lazy(() => import('./pages/docs/TraceNexDoc'));
+const TraceNexDoc = lazy(() => import('./pages/TraceNexDocs'));
 
 function App() {
   const location = useLocation();

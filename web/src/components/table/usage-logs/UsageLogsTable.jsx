@@ -75,7 +75,7 @@ const LogsTable = (logsData) => {
   const expandRowRender = (record, index) => {
     return <Descriptions data={expandData[record.key]} />;
   };
-
+  
   return (
     <CardTable
       columns={tableColumns}

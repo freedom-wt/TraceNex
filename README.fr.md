@@ -2,7 +2,7 @@
 
 ![new-api](/web/public/logo.png)
 
-# New API
+# TraceNex
 
 🍥 **Passerelle de modèles étendus de nouvelle génération et système de gestion d'actifs d'IA**
 
@@ -440,7 +440,7 @@ Bienvenue à toutes les formes de contribution!
 
 <div align="center">
 
-### 💖 Merci d'utiliser New API
+### 💖 Merci d'utiliser TraceNex
 
 Si ce projet vous est utile, bienvenue à nous donner une ⭐️ Étoile！
 

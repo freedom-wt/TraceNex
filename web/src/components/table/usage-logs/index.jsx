@@ -41,17 +41,9 @@ const LogsPage = () => {
       <Button
         className='mb-2'
         onClick={logsData.exportAllLogs}
-        disabled={logsData.isExporting}
       >
-        {logsData.isExporting ? '导出中...' : '导出全部数据'}
+        导出全部数据
       </Button>
-     { logsData.isExporting && <Button
-        className='mb-2 ml-2' 
-        onClick={logsData.cancelExport}
-      >
-        取消导出
-      </Button>}
-      {logsData.exportProgress && <p style={{color: '#666', marginTop: '4px', marginBottom: '8px'}}>{logsData.exportProgress}</p>}
       {/* Main Content */}
       <CardPro
         type='type2'

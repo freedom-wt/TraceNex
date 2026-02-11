@@ -1,11 +1,14 @@
 package middleware
 
 import (
+	"encoding/json"
 	"fmt"
 	"net"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/QuantumNous/new-api/common"
 	"github.com/QuantumNous/new-api/constant"
@@ -17,6 +20,27 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
+
+func debugNDJSON(hypothesisId string, location string, message string, data map[string]any) {
+	// #region agent log
+	f, err := os.OpenFile("d:\\谷歌浏览器\\new-api-main\\.cursor\\debug.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err == nil {
+		payload := map[string]any{
+			"id":           fmt.Sprintf("log_%d", time.Now().UnixNano()),
+			"timestamp":    time.Now().UnixMilli(),
+			"runId":        "pre-fix",
+			"hypothesisId": hypothesisId,
+			"location":     location,
+			"message":      message,
+			"data":         data,
+		}
+		if b, e := json.Marshal(payload); e == nil {
+			_, _ = f.Write(append(b, '\n'))
+		}
+		_ = f.Close()
+	}
+	// #endregion
+}
 
 func validUserInfo(username string, role int) bool {
 	// check username is empty
@@ -36,10 +60,23 @@ func authHelper(c *gin.Context, minRole int) {
 	id := session.Get("id")
 	status := session.Get("status")
 	useAccessToken := false
+	debugNDJSON("H2", "middleware/auth.go:authHelper:entry", "authHelper entry", map[string]any{
+		"path":             c.Request.URL.Path,
+		"method":           c.Request.Method,
+		"minRole":          minRole,
+		"hasSessionUser":   username != nil,
+		"hasSessionId":     id != nil,
+		"hasAuthHeader":    c.Request.Header.Get("Authorization") != "",
+		"hasNewApiUserHdr": c.Request.Header.Get("New-Api-User") != "",
+	})
 	if username == nil {
 		// Check access token
 		accessToken := c.Request.Header.Get("Authorization")
 		if accessToken == "" {
+			debugNDJSON("H2", "middleware/auth.go:authHelper:no_session_no_token", "no session and no Authorization header", map[string]any{
+				"path":   c.Request.URL.Path,
+				"method": c.Request.Method,
+			})
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"success": false,
 				"message": "无权进行此操作，未登录且未提供 access token",
@@ -72,12 +109,18 @@ func authHelper(c *gin.Context, minRole int) {
 			return
 		}
 	}
-	// get header New-Api-User
+	// get header New-Api-User（TraceNex 用户标识）
 	apiUserIdStr := c.Request.Header.Get("New-Api-User")
 	if apiUserIdStr == "" {
+		debugNDJSON("H1", "middleware/auth.go:authHelper:missing_new_api_user", "missing New-Api-User header", map[string]any{
+			"path":           c.Request.URL.Path,
+			"method":         c.Request.Method,
+			"useAccessToken": useAccessToken,
+			"hasSessionUser": username != nil,
+		})
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
-			"message": "无权进行此操作，未提供 New-Api-User",
+			"message": "无权进行此操作，未提供 TraceNex 用户标识（New-Api-User）",
 		})
 		c.Abort()
 		return
@@ -86,7 +129,7 @@ func authHelper(c *gin.Context, minRole int) {
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
-			"message": "无权进行此操作，New-Api-User 格式错误",
+			"message": "无权进行此操作，TraceNex 用户标识（New-Api-User）格式错误",
 		})
 		c.Abort()
 		return
@@ -95,7 +138,7 @@ func authHelper(c *gin.Context, minRole int) {
 	if id != apiUserId {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
-			"message": "无权进行此操作，New-Api-User 与登录用户不匹配",
+			"message": "无权进行此操作，TraceNex 用户标识（New-Api-User）与登录用户不匹配",
 		})
 		c.Abort()
 		return

@@ -2,7 +2,7 @@
 
 ![new-api](/web/public/logo.png)
 
-# New API
+# TraceNex
 
 🍥 **次世代大規模モデルゲートウェイとAI資産管理システム**
 
@@ -411,7 +411,7 @@ docker run --name new-api -d --restart always \
 | プロジェクト | 説明 |
 |------|------|
 | [neko-api-key-tool](https://github.com/Calcium-Ion/neko-api-key-tool) | キー使用量クォータ照会ツール |
-| [new-api-horizon](https://github.com/Calcium-Ion/new-api-horizon) | New API高性能最適化版 |
+| [new-api-horizon](https://github.com/Calcium-Ion/new-api-horizon) | TraceNex高性能最適化版 |
 
 ---
 
@@ -449,7 +449,7 @@ docker run --name new-api -d --restart always \
 
 <div align="center">
 
-### 💖 New APIをご利用いただきありがとうございます
+### 💖 TraceNexをご利用いただきありがとうございます
 
 このプロジェクトがあなたのお役に立てたなら、ぜひ ⭐️ スターをください！
 

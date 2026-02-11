@@ -53,6 +53,7 @@ const Dashboard = lazy(() => import('./pages/Dashboard'));
 const About = lazy(() => import('./pages/About'));
 const UserAgreement = lazy(() => import('./pages/UserAgreement'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+const TraceNexDoc = lazy(() => import('./pages/TraceNexDocs'));
 
 function App() {
   const location = useLocation();
@@ -82,8 +83,8 @@ function App() {
     }
     return false; // 默认不需要登录
   }, [statusState?.status?.HeaderNavModules]);
-
-    // 获取操作场权限配置
+  
+  // 获取操作场权限配置
   const playgroundRequireAuth = useMemo(() => {
     const headerNavModulesConfig = statusState?.status?.HeaderNavModules;
     if (headerNavModulesConfig) {
@@ -383,6 +384,25 @@ function App() {
                 <Chat2Link />
               </Suspense>
             </PrivateRoute>
+          }
+        />
+        <Route
+          path='/docs:/traceNexDocs'
+          element={
+            pricingRequireAuth ? (
+              <PrivateRoute>
+                <Suspense
+                  fallback={<Loading></Loading>}
+                  key={location.pathname}
+                >
+                  <TraceNexDoc />
+                </Suspense>
+              </PrivateRoute>
+            ) : (
+              <Suspense fallback={<Loading></Loading>} key={location.pathname}>
+                <TraceNexDoc />
+              </Suspense>
+            )
           }
         />
         <Route path='*' element={<NotFound />} />

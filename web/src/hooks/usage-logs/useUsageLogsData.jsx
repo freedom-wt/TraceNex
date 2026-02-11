@@ -539,7 +539,6 @@ export const useLogsData = () => {
       setPageSize(data.page_size);
       setLogCount(data.total);
 
-      setLogsFormat(newPageData);
       return {
         list: newPageData,
         total: data.total,

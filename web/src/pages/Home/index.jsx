@@ -224,7 +224,7 @@ const Home = () => {
                       {t('获取密钥')}
                     </Button>
                   </Link>
-{/*                   
+                  {/*                   
                   {isDemoSiteMode && statusState?.status?.version ? (
                     <Button
                       size={isMobile ? 'default' : 'large'}
@@ -251,6 +251,7 @@ const Home = () => {
                       </Button>
                     )
                   )} */}
+                  
                   <Link to='/pricing'>
                     <Button
                       type='default'
@@ -258,7 +259,7 @@ const Home = () => {
                       className='!rounded-3xl px-8 py-2'
                     >
                       {t('Explore Models')}
-                       <div className='w-8 h-8  flex items-center justify-center'>
+                      <div className='w-8 h-8  flex items-center justify-center'>
                         <Moonshot size={20} />
                       </div>
                       <div className='w-8 h-8 flex items-center justify-center'>

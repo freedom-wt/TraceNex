@@ -548,8 +548,18 @@ export const useLogsData = () => {
     }
   }
 
+  // 转义 CSV 单元格：若含逗号、引号或换行则用双引号包裹，内部双引号写为 ""
+  const escapeCsvCell = (str) => {
+    if (str == null) return '';
+    const s = String(str);
+    if (/[,"\r\n]/.test(s)) {
+      return '"' + s.replace(/"/g, '""') + '"';
+    }
+    return s;
+  };
+
   // 使用后端导出接口，按当前筛选条件导出所有日志（管理员 / 普通用户）
-  // 通过 axios API 请求，确保携带 New-Api-User 等鉴权头，然后在前端触发 CSV 下载
+  // 请求 format=json 后在前端用 renderQuota 计算花费列再生成 CSV，与表格展示一致
   const exportAllLogs = useCallback(async () => {
     const {
       username,
@@ -570,23 +580,65 @@ export const useLogsData = () => {
 
     let url = '';
     if (isAdminUser) {
-      url = `/api/log/export?type=${currentLogType}&username=${username}&token_name=${token_name}&model_name=${model_name}&start_timestamp=${localStartTimestamp}&end_timestamp=${localEndTimestamp}&channel=${channel}&group=${group}`;
+      url = `/api/log/export?format=json&type=${currentLogType}&username=${username}&token_name=${token_name}&model_name=${model_name}&start_timestamp=${localStartTimestamp}&end_timestamp=${localEndTimestamp}&channel=${channel}&group=${group}`;
     } else {
-      url = `/api/log/self/export?type=${currentLogType}&token_name=${token_name}&model_name=${model_name}&start_timestamp=${localStartTimestamp}&end_timestamp=${localEndTimestamp}&group=${group}`;
+      url = `/api/log/self/export?format=json&type=${currentLogType}&token_name=${token_name}&model_name=${model_name}&start_timestamp=${localStartTimestamp}&end_timestamp=${localEndTimestamp}&group=${group}`;
     }
 
     url = encodeURI(url);
 
     try {
-      // 使用 API（axios 实例）发起请求，这里会自动携带 New-Api-User 头，后端鉴权才能通过
-      const response = await API.get(url, {
-        responseType: 'blob',
-        skipErrorHandler: true,
-      });
+      const response = await API.get(url, { skipErrorHandler: true });
+      const { success, message, data: logs } = response.data;
+      if (!success || !Array.isArray(logs)) {
+        showError(message || '导出失败');
+        return;
+      }
 
-      const blob = new Blob([response.data], {
-        type: 'text/csv;charset=utf-8;',
-      });
+      const header = ['时间', '渠道', '用户', '令牌', '分组', '类型', '模型', '用时/首字', '输入', '输出', '花费', 'IP', '重试', '详情'];
+      const rows = [header.map(escapeCsvCell).join(',')];
+
+      for (const log of logs) {
+        let timeStr = '';
+        if (log.created_at) {
+          const d = new Date(log.created_at * 1000);
+          timeStr =
+                `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ` +
+                `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
+        }
+        const channelStr =
+          log.channel != null || log.channel_name
+            ? `${log.channel || ''}${log.channel_name ? ' - ' + log.channel_name : ''}`
+            : '';
+        const useTimeStr = log.use_time > 0 ? String(log.use_time) : '';
+        const promptStr = log.prompt_tokens > 0 ? String(log.prompt_tokens) : '';
+        const completionStr = log.completion_tokens > 0 ? String(log.completion_tokens) : '';
+        // 使用 ="$0.000384" 形式，让 Excel 按文本显示，避免被格式化为货币只显示两位小数
+        const costStr =
+          log.type === 0 || log.type === 2 || log.type === 5
+            ? `="${renderQuota(log.quota || 0, 6)}"`
+            : '';
+        const row = [
+          timeStr,
+          channelStr,
+          log.username || '',
+          log.token_name || '',
+          log.group || '',
+          String(log.type ?? ''),
+          log.model_name || '',
+          useTimeStr,
+          promptStr,
+          completionStr,
+          costStr,
+          log.ip || '',
+          '',
+          log.content || '',
+        ];
+        rows.push(row.map(escapeCsvCell).join(','));
+      }
+
+      const csvContent = '\uFEFF' + rows.join('\r\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = downloadUrl;

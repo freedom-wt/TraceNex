@@ -124,7 +124,7 @@ func writeLogsCSV(c *gin.Context, logs []*model.Log) {
 	w.Flush()
 }
 
-// ExportAllLogs 管理员导出全部日志（当前筛选条件下，最多 MaxLogExportItems 条），返回 CSV
+// ExportAllLogs 管理员导出全部日志（当前筛选条件下，最多 MaxLogExportItems 条），返回 CSV 或 format=json 时返回 JSON
 func ExportAllLogs(c *gin.Context) {
 	logType, _ := strconv.Atoi(c.Query("type"))
 	startTimestamp, _ := strconv.ParseInt(c.Query("start_timestamp"), 10, 64)
@@ -139,10 +139,14 @@ func ExportAllLogs(c *gin.Context) {
 		common.ApiError(c, err)
 		return
 	}
+	if c.Query("format") == "json" {
+		common.ApiSuccess(c, logs)
+		return
+	}
 	writeLogsCSV(c, logs)
 }
 
-// ExportUserLogs 用户导出自己的日志（当前筛选条件下，最多 MaxLogExportItems 条），返回 CSV
+// ExportUserLogs 用户导出自己的日志（当前筛选条件下，最多 MaxLogExportItems 条），返回 CSV 或 format=json 时返回 JSON
 func ExportUserLogs(c *gin.Context) {
 	userId := c.GetInt("id")
 	logType, _ := strconv.Atoi(c.Query("type"))
@@ -154,6 +158,10 @@ func ExportUserLogs(c *gin.Context) {
 	logs, err := model.GetUserLogsForExport(userId, logType, startTimestamp, endTimestamp, modelName, tokenName, group)
 	if err != nil {
 		common.ApiError(c, err)
+		return
+	}
+	if c.Query("format") == "json" {
+		common.ApiSuccess(c, logs)
 		return
 	}
 	writeLogsCSV(c, logs)
